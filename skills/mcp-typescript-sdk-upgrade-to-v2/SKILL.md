@@ -35,6 +35,14 @@ If you are already on v2 and want to adopt the **2026-07-28 protocol revision**,
    the changed files (`prettier --write` / `eslint --fix` / `biome format --write`); the
    codemod prints the exact command after it runs.
 6. **Run your tests.**
+7. **Decide whether to serve 2026-07-28.** The codemod keeps your transport wiring, so a
+   server on `server.connect(new StdioServerTransport())` or a hand-built
+   `NodeStreamableHTTPServerTransport` still speaks only the 2025 era. Clients with
+   `versionNegotiation: { mode: 'auto' }` fall back to `initialize` and connect; a client
+   pinned to `{ pin: '2026-07-28' }` cannot. To serve both eras, switch to
+   `serveStdio(() => buildServer())` on stdio and `createMcpHandler(() => buildServer())`
+   over HTTP, as [Serving the 2026-07-28 revision](https://ts.sdk.modelcontextprotocol.io/v2/migration/support-2026-07-28.md#serving-the-2026-07-28-revision)
+   describes, then connect a client pinned to `{ pin: '2026-07-28' }` to check.
 
 Migrating a large codebase gradually instead of in one pass? See
 [Migrating in stages (large codebases)](references/packaging-runtime.md#migrating-in-stages-large-codebases).
